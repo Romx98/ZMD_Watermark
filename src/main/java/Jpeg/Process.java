@@ -1,8 +1,8 @@
 package Jpeg;
 
-import Enums.ColorType;
 import Enums.ComponentType;
 import Graphics.Dialogs;
+import Watermark.LSB;
 import Jama.Matrix;
 
 import java.awt.*;
@@ -22,7 +22,7 @@ public class Process {
     private Matrix originalImageY, originalWatermarkY;
     private Matrix originalImageCr, originalWatermarkCr;
     private Matrix originalImageCb, originalWatermarkCb;
-    private Matrix markImageLSB, extractWatermarkLSB;
+    private Matrix markImageLSB;
 
 
     private int imageHeight, watermarkHeight;
@@ -110,25 +110,21 @@ public class Process {
     }
 
     /**
-     * Metoda pro získání jednobarevného obrázku z 2D polí pro jednu barvu
+     * Extraction of one colour from YCbCr
      *
-     * @param color     pole pro jednu barvu
-     * @param type      typ barvy, pro zjištění, do které barevné složky se má zapsat
-     * @return Obrázek vytvořený z jednobarevného pole
+     * @param color - Matrix of colour
+     * @return Image based on one colour
      */
-    public BufferedImage getOneColorImageFromRGB(int[][] color, ColorType type) {
-        int height = color.length;
-        int width = color[0].length;
+    public BufferedImage getOneColorImageFromYCbCr(Matrix color) {
+        int height = color.getRowDimension();
+        int width = color.getColumnDimension();
 
         BufferedImage bfImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
         for (int h = 0; h < height; h++) {
             for (int w = 0; w < width; w++) {
-                int pixel = color[h][w];
-
-                bfImage.setRGB(w, h,
-                        (new Color((type == ColorType.RED ? pixel : 0),
-                                (type == ColorType.GREEN ? pixel : 0),
-                                (type == ColorType.BLUE ? pixel : 0))).getRGB());
+                int pixel = checkValue(color.get(h, w));
+                bfImage.setRGB(w, h, (new Color(pixel, pixel, pixel)).getRGB());
             }
         }
 
@@ -136,46 +132,44 @@ public class Process {
     }
 
     /**
-     * Metoda pro převod obrázku z RGB do YCbCr.
-     * Hodnoty se uloží do originálních i modifikovaných matic.
+     * Watermarking process using LSB technique
+     *
+     * @param componentsType - Image component (Y, Cb, Cr)
+     * @param level - Bit level
+     * @param multiple - Multiple watermark
+     * @return Watermarked component image
      */
-    public BufferedImage getOneColorImageFromYCbCr(Matrix color) {
-        int height = color.getRowDimension();
-        int width = color.getColumnDimension();
-
-        BufferedImage bfImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        for (int h = 0; h < height; h++) {
-            for (int w = 0; w < width; w++) {
-                int pixel = checkValue(color.get(h, w));
-                bfImage.setRGB(w, h, (new Color(pixel, pixel, pixel)).getRGB());
-            }
-        }
-        return bfImage;
-    }
-
-    public BufferedImage getImageWithLSBWatermark(ComponentType componentsType, int level, int key) {
+    public BufferedImage getImageWithLSBWatermark(ComponentType componentsType, int level, boolean multiple) {
         switch (componentsType) {
             case CB:
-                markImageLSB = Watermark.watermarkedMatrixWithLSB(getOriginalImageCb(), getOriginalWatermarkCb(), level, key);
+                markImageLSB = LSB.watermarkedMatrixWithLSB(
+                        getOriginalImageCb(), getOriginalWatermarkCb(), level, multiple);
                 break;
             case CR:
-                markImageLSB = Watermark.watermarkedMatrixWithLSB(getOriginalImageCr(), getOriginalWatermarkCr(), level, key);
+                markImageLSB = LSB.watermarkedMatrixWithLSB(
+                        getOriginalImageCr(), getOriginalWatermarkCr(), level, multiple);
                 break;
             case Y:
             default:
-                markImageLSB = Watermark.watermarkedMatrixWithLSB(getOriginalImageY(), getOriginalWatermarkY(), level, key);
+                markImageLSB = LSB.watermarkedMatrixWithLSB(
+                        getOriginalImageY(), getOriginalWatermarkY(), level, multiple);
                 break;
         }
 
         return getOneColorImageFromYCbCr(markImageLSB);
     }
 
-    public BufferedImage getExtractImageWithLSBWatermark(int level, int key) {
-        extractWatermarkLSB = Watermark.extractedMatrixWithLSB(getMarkImageLSB(), level, key);
+    /**
+     * Watermark extraction process using LSB technique
+     *
+     * @param level - Bit level
+     * @return Extracted watermark
+     */
+    public BufferedImage getExtractImageWithLSBWatermark(int level) {
+        Matrix extractWatermarkLSB = LSB.extractedMatrixWithLSB(getMarkImageLSB(), level);
 
         return getOneColorImageFromYCbCr(extractWatermarkLSB);
     }
-
 
     /**
      *  GETTERS
@@ -186,30 +180,6 @@ public class Process {
 
     public BufferedImage getOriginalWatermark() {
         return originalWatermark;
-    }
-
-    public int[][] getOriginalImageRed() {
-        return originalImageRed;
-    }
-
-    public int[][] getOriginalWatermarkRed() {
-        return originalWatermarkRed;
-    }
-
-    public int[][] getOriginalImageGreen() {
-        return originalImageGreen;
-    }
-
-    public int[][] getOriginalWatermarkGreen() {
-        return originalWatermarkGreen;
-    }
-
-    public int[][] getOriginalImageBlue() {
-        return originalImageBlue;
-    }
-
-    public int[][] getOriginalWatermarkBlue() {
-        return originalWatermarkBlue;
     }
 
     public Matrix getOriginalImageY() {
@@ -238,40 +208,5 @@ public class Process {
 
     public Matrix getMarkImageLSB() {
         return markImageLSB;
-    }
-
-    public int getWatermarkHeight() {
-        return watermarkHeight;
-    }
-
-    public int getWatermarkWidth() {
-        return watermarkWidth;
-    }
-
-    public int getImageHeight() {
-        return imageHeight;
-    }
-
-    public int getImageWidth() {
-        return imageWidth;
-    }
-
-    /**
-     *  SETTERS
-     */
-    public void setOriginalImageY(Matrix originalImageY) {
-        this.originalImageY = originalImageY;
-    }
-
-    public void setOriginalImageCr(Matrix originalImageCr) {
-        this.originalImageCr = originalImageCr;
-    }
-
-    public void setOriginalImageCb(Matrix originalImageCb) {
-        this.originalImageCb = originalImageCb;
-    }
-
-    public void setMarkImageLSB(Matrix markImageLSB) {
-        this.markImageLSB = markImageLSB;
     }
 }

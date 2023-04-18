@@ -1,7 +1,6 @@
 package Graphics;
 
 import Core.FilePaths;
-import Enums.ColorType;
 import Enums.ComponentType;
 import Jpeg.Process;
 import javafx.fxml.FXML;
@@ -17,13 +16,16 @@ import java.util.function.UnaryOperator;
 public class MainWindowController implements Initializable {
 
     @FXML
-    private Button buttonMarkLSB, buttonExcratLSB;
+    private Button buttonMarkLSB, buttonExtractLSB;
+
+    @FXML
+    private CheckBox multipleWatermark;
 
     @FXML
     private Slider bitLevel;
 
     @FXML
-    private TextField bitLevelField, keyField;
+    private TextField bitLevelField;
 
     @FXML
     private ComboBox<ComponentType> componentType;
@@ -42,11 +44,9 @@ public class MainWindowController implements Initializable {
         chooseWatermark = FilePaths.defaultWatermark;
         componentType.getSelectionModel().select(ComponentType.Y);
         bitLevel.setValue(3);
-        buttonExcratLSB.setDisable(true);
+        buttonExtractLSB.setDisable(true);
 
         // Set fields
-        keyField.setTextFormatter(new TextFormatter<>(filterKeyNumber));
-        keyField.textProperty().setValue("123456");
         bitLevelField.setTextFormatter(new TextFormatter<>(filterLevelNumber));
         bitLevelField.textProperty().bindBidirectional(bitLevel.valueProperty(), nfL);
 
@@ -86,32 +86,6 @@ public class MainWindowController implements Initializable {
     }
 
     /**
-     *  Display of COLOR components - RGB -- Image and Watermark
-     */
-    public void ShowRedOriginal() {
-        Dialogs.showImageInWindow(process.getOneColorImageFromRGB(process.getOriginalImageRed(), ColorType.RED),
-                "Original Image Red");
-        Dialogs.showImageInWindow(process.getOneColorImageFromRGB(process.getOriginalWatermarkRed(), ColorType.RED),
-                "Original Watermark Red");
-    }
-
-    public void ShowGreenOriginal() {
-        Dialogs.showImageInWindow(process.getOneColorImageFromRGB(process.getOriginalImageGreen(), ColorType.GREEN),
-                "Original Image Green");
-        Dialogs.showImageInWindow(process.getOneColorImageFromRGB(process.getOriginalWatermarkGreen(), ColorType.GREEN),
-                "Original Watermark Green");
-
-    }
-
-    public void ShowBlueOriginal() {
-        Dialogs.showImageInWindow(process.getOneColorImageFromRGB(process.getOriginalImageBlue(), ColorType.BLUE),
-                "Original Image Blue");
-        Dialogs.showImageInWindow(process.getOneColorImageFromRGB(process.getOriginalWatermarkBlue(), ColorType.BLUE),
-                "Original Watermark Blue");
-    }
-    // end
-
-    /**
      *  Display of COLOR components - YCbCr -- Image and Watermark
      */
     public void ShowYOriginal() {
@@ -140,19 +114,17 @@ public class MainWindowController implements Initializable {
      * Watermarks the image using the LSB method
      */
     public void MarkLSBWatermark() {
-        buttonExcratLSB.setDisable(false);
+        buttonExtractLSB.setDisable(false);
         Dialogs.showImageInWindow(process.getImageWithLSBWatermark(componentType.getSelectionModel().getSelectedItem(),
-                (int) bitLevel.getValue(), (int) bitLevel.getValue()), "Watermark Image - LSB");
+                (int) bitLevel.getValue(), multipleWatermark.isSelected()), "Watermark Image - LSB");
     }
 
     /**
      * Show mark image with LSB method
      */
     public void ExtractLSBWatermark() {
-        Dialogs.showImageInWindow(process.getExtractImageWithLSBWatermark((int) bitLevel.getValue(),
-                (int) bitLevel.getValue()), "Extracted watermark - LSB");
-
-
+        Dialogs.showImageInWindow(process.getExtractImageWithLSBWatermark((int) bitLevel.getValue()),
+                "Extracted watermark - LSB");
     }
 
     /**
@@ -168,16 +140,8 @@ public class MainWindowController implements Initializable {
     }
 
     private static final UnaryOperator<TextFormatter.Change> filterLevelNumber = change -> {
-        String text = change.getText();
+        String text = change.getControlNewText();
         if (text.matches("[1-8]")) return change;
         return null;
     };
-
-    private static final UnaryOperator<TextFormatter.Change> filterKeyNumber = change -> {
-        String text = change.getText();
-        if (text.matches("[0-9,]*")) return change;
-        return null;
-    };
-
-
 }
