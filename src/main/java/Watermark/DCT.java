@@ -10,6 +10,7 @@ public class DCT {
      *
      * @param image - Component matrix
      * @param watermark - Message binary text
+     * @param blockSize - Block size
      * @param deep - Deep level
      * @param x1 - position X for block 1
      * @param y1 - position Y for block 1
@@ -18,14 +19,14 @@ public class DCT {
      * @return Watermarked component matrix
      */
     public static Matrix watermarkedMatrixWithDCT(
-            final Matrix image, final String watermark, final int deep, final int x1,
+            final Matrix image, final String watermark, final int blockSize, final int deep, final int x1,
             final int y1, final int x2, final int y2) {
         Matrix result = image.copy();
 
         int iCols = image.getColumnDimension();
         int iRows = image.getRowDimension();
-        int iColBlocks = iCols / deep;
-        int iRowBlocks = iRows / deep;
+        int iColBlocks = iCols / blockSize;
+        int iRowBlocks = iRows / blockSize;
         int[] wBinaryArray = convertStringToBinaryArray(watermark);
         int wCount = 0;
 
@@ -33,11 +34,11 @@ public class DCT {
             return result;
         }
 
-        for (int iCol = 0; iCol < (iCols - deep + 1); iCol  += deep) {
-            for (int iRow = 0; iRow < (iRows - deep + 1); iRow += deep) {
+        for (int iCol = 0; iCol < (iCols - blockSize + 1); iCol  += blockSize) {
+            for (int iRow = 0; iRow < (iRows - blockSize + 1); iRow += blockSize) {
                 if (wCount > (wBinaryArray.length - 1)) break;
 
-                Matrix iBlock = result.getMatrix(iRow, iRow + deep - 1, iCol, iCol + deep - 1);
+                Matrix iBlock = result.getMatrix(iRow, iRow + blockSize - 1, iCol, iCol + blockSize - 1);
 
                 double block1 = result.get(x1, y1);
                 double block2 = result.get(x2, y2);
@@ -46,7 +47,7 @@ public class DCT {
                 iBlock.set(x1, y1, markedValues[0]);
                 iBlock.set(x2, y2, markedValues[1]);
 
-                result.setMatrix(iRow, iRow + deep - 1, iCol, iCol + deep - 1, iBlock);
+                result.setMatrix(iRow, iRow + blockSize - 1, iCol, iCol + blockSize - 1, iBlock);
                 wCount++;
             }
 
@@ -99,7 +100,7 @@ public class DCT {
      * Watermark main function to extraction from given components using 2-DCT technique
      *
      * @param image - Marked component matrix
-     * @param deep - Deep level
+     * @param blockSize - Block size
      * @param x1 - position X for block 1
      * @param y1 - position Y for block 1
      * @param x2 - position X for block 2
@@ -108,7 +109,7 @@ public class DCT {
      * @return Extracted or error message
      */
     public static String extractedMessageWithDCT(
-            final Matrix image, final int deep, final int x1, final int y1, final int x2, final int y2, int messageLen) {
+            final Matrix image, final int blockSize, final int x1, final int y1, final int x2, final int y2, int messageLen) {
         Matrix result = image.copy();
 
         int iCols = image.getColumnDimension();
@@ -116,11 +117,11 @@ public class DCT {
         int[] wExtractedBinary = new int[messageLen];
         int wCount = 0;
 
-        for (int iCol = 0; iCol < (iCols - deep + 1); iCol  += deep) {
-            for (int iRow = 0; iRow < (iRows - deep + 1); iRow += deep) {
+        for (int iCol = 0; iCol < (iCols - blockSize + 1); iCol  += blockSize) {
+            for (int iRow = 0; iRow < (iRows - blockSize + 1); iRow += blockSize) {
                 if (wCount > (messageLen - 1)) break;
 
-                Matrix iBlock = result.getMatrix(iRow, iRow + deep - 1, iCol, iCol + deep - 1);
+                Matrix iBlock = result.getMatrix(iRow, iRow + blockSize - 1, iCol, iCol + blockSize - 1);
 
                 double block1 = iBlock.get(x1, y1);
                 double block2 = iBlock.get(x2, y2);

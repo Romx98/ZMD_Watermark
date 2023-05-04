@@ -198,14 +198,14 @@ public class Process {
             ComponentType componentsType, String message, int deep, int x1, int y1, int x2, int y2) {
         switch (componentsType) {
             case CB:
-                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageCb(), message, deep, x1, y1, x2, y2);
+                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageCb(), message, 8, deep, x1, y1, x2, y2);
                 break;
             case CR:
-                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageCr(), message, deep, x1, y1, x2, y2);
+                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageCr(), message, 8, deep, x1, y1, x2, y2);
                 break;
             case Y:
             default:
-                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageY(), message, deep, x1, y1, x2, y2);
+                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageY(), message, 8, deep, x1, y1, x2, y2);
                 break;
         }
 
@@ -215,7 +215,6 @@ public class Process {
     /**
      * Watermark extraction process using DCT technique
      *
-     * @param deep - deep level
      * @param x1 - position X for block 1
      * @param y1 - position Y for block 1
      * @param x2 - position X for block 2
@@ -223,8 +222,8 @@ public class Process {
      * @param messageLen - message length
      * @return Extracted message
      */
-    public String getImageWithDCTWatermark(int deep, int x1, int y1, int x2, int y2, int messageLen) {
-        return DCT.extractedMessageWithDCT(getMarkImageDCT(), deep, x1, y1, x2, y2, messageLen);
+    public String getImageWithDCTWatermark(int x1, int y1, int x2, int y2, int messageLen) {
+        return DCT.extractedMessageWithDCT(getMarkImageDCT(), 8, x1, y1, x2, y2, messageLen);
 
     }
 

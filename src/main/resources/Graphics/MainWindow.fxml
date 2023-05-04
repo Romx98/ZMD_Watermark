@@ -325,11 +325,10 @@
                       <ColumnConstraints hgrow="SOMETIMES" maxWidth="261.0" minWidth="10.0" prefWidth="261.0" />
                     </columnConstraints>
                     <rowConstraints>
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="25.0" minHeight="10.0" prefHeight="22.0" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="39.0" minHeight="10.0" prefHeight="39.0" vgrow="SOMETIMES" />
-                        <RowConstraints maxHeight="44.0" minHeight="10.0" prefHeight="44.0" vgrow="SOMETIMES" />
-                      <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="43.0" minHeight="10.0" prefHeight="41.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="57.0" minHeight="10.0" prefHeight="34.0" vgrow="SOMETIMES" />
+                        <RowConstraints maxHeight="81.0" minHeight="10.0" prefHeight="52.0" vgrow="SOMETIMES" />
+                      <RowConstraints maxHeight="77.0" minHeight="10.0" prefHeight="51.0" vgrow="SOMETIMES" />
                     </rowConstraints>
                      <children>
                         <Label text="Attacks" textAlignment="CENTER" textFill="#2c3e50" GridPane.columnIndex="2" GridPane.halignment="CENTER" GridPane.valignment="CENTER">
@@ -337,7 +336,7 @@
                               <Font name="System Bold Italic" size="28.0" />
                            </font>
                         </Label>
-                        <Button fx:id="buttonExtractRotation" mnemonicParsing="false" onAction="#exctractAttackRotation" prefHeight="35.0" prefWidth="130.0" style="-fx-background-radius: 10; -fx-background-color: #2c3e50;" text="Extract watermark" textFill="#eff3f8" GridPane.halignment="CENTER" GridPane.rowIndex="4" GridPane.valignment="CENTER">
+                        <Button fx:id="buttonExtractRotation" mnemonicParsing="false" onAction="#exctractAttackRotation" prefHeight="35.0" prefWidth="130.0" style="-fx-background-radius: 10; -fx-background-color: #2c3e50;" text="Extract watermark" textFill="#eff3f8" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="3" GridPane.valignment="CENTER">
                            <font>
                               <Font name="System Bold Italic" size="12.0" />
                            </font>
@@ -345,9 +344,17 @@
                               <Insets top="5.0" />
                            </GridPane.margin>
                         </Button>
-                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="3">
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.rowIndex="2" />
+                        <Label text="Rotation - JPEG" textAlignment="CENTER" textFill="#2c3e50" GridPane.columnIndex="4" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
+                           <font>
+                              <Font name="System Bold Italic" size="20.0" />
+                           </font>
+                        </Label>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+                        <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="2" />
+                        <HBox prefHeight="100.0" prefWidth="200.0" GridPane.columnIndex="4" GridPane.rowIndex="2">
                            <children>
-                              <Button fx:id="buttonAttack45" mnemonicParsing="false" onAction="#attackRotation45" prefHeight="35.0" prefWidth="100.0" style="-fx-background-radius: 10; -fx-background-color: #2c3e50;" text=" 45°" textFill="#eff3f8">
+                              <Button fx:id="buttonAttack45" mnemonicParsing="false" onAction="#attackRotation45" prefHeight="35.0" prefWidth="100.0" style="-fx-background-radius: 10; -fx-background-color: #384F46;" text=" 45°" textFill="#eff3f8">
                                  <font>
                                     <Font name="System Bold Italic" size="12.0" />
                                  </font>
@@ -355,7 +362,7 @@
                                     <Insets left="25.0" right="10.0" top="5.0" />
                                  </HBox.margin>
                               </Button>
-                              <Button fx:id="buttonMarkLSB2" mnemonicParsing="false" onAction="#attackRotation90" prefHeight="35.0" prefWidth="100.0" style="-fx-background-radius: 10; -fx-background-color: #2c3e50;" text=" 90°" textFill="#eff3f8">
+                              <Button fx:id="buttonMarkLSB2" mnemonicParsing="false" onAction="#attackRotation90" prefHeight="35.0" prefWidth="100.0" style="-fx-background-radius: 10; -fx-background-color: #384F46;" text=" 90°" textFill="#eff3f8">
                                  <font>
                                     <Font name="System Bold Italic" size="12.0" />
                                  </font>
@@ -365,14 +372,6 @@
                               </Button>
                            </children>
                         </HBox>
-                        <Label text="Rotation" textAlignment="CENTER" textFill="#2c3e50" GridPane.halignment="CENTER" GridPane.rowIndex="1" GridPane.valignment="CENTER">
-                           <font>
-                              <Font name="System Bold Italic" size="20.0" />
-                           </font>
-                        </Label>
-                        <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-                        <Separator orientation="VERTICAL" prefHeight="200.0" GridPane.columnIndex="3" GridPane.halignment="CENTER" GridPane.rowIndex="2" GridPane.rowSpan="3" />
-                        <ComboBox fx:id="watermarkType" prefHeight="30.0" prefWidth="150.0" promptText="Watermarked image" style="-fx-background-radius: 10;" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
                      </children>
                   </GridPane>
                </children>

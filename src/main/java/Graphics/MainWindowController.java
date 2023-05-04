@@ -181,7 +181,7 @@ public class MainWindowController implements Initializable {
      */
     public void ExtractDCTWatermark() {
         String message = process_jpg.getImageWithDCTWatermark(
-                (int) deepLevel.getValue(), (int) coefficient1X.getValue(), (int) coefficient1Y.getValue(),
+                (int) coefficient1X.getValue(), (int) coefficient1Y.getValue(),
                 (int) coefficient2X.getValue(), (int) coefficient2Y.getValue(), messageWatermarkField.getLength());
 
         extractedMessageWatermarkField.setText(message);
