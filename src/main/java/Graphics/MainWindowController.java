@@ -17,7 +17,7 @@ import java.util.function.UnaryOperator;
 public class MainWindowController implements Initializable {
 
     @FXML
-    private Button buttonExtractLSB;
+    private Button buttonExtractLSB, buttonExtractDCT, buttonAttack45, buttonAttack90, buttonExtractRotation;
 
     @FXML
     private CheckBox multipleWatermark;
@@ -36,6 +36,7 @@ public class MainWindowController implements Initializable {
 
     private Process process_png, process_jpg;
     private String choosePNG, chooseJPG, chooseWatermark;
+    private int selectRotation;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -53,7 +54,13 @@ public class MainWindowController implements Initializable {
 //        watermarkType.getSelectionModel().select(WatermarkType.DCT.ordinal());
         bitLevel.setValue(3);
         deepLevel.setValue(50);
+
+        // Set button
         buttonExtractLSB.setDisable(true);
+        buttonExtractDCT.setDisable(true);
+        buttonAttack45.setDisable(true);
+        buttonAttack90.setDisable(true);
+        buttonExtractRotation.setDisable(true);
 
         // Set fields
         bitLevelField.setTextFormatter(new TextFormatter<>(filterNumber("[1-9]")));
@@ -173,6 +180,10 @@ public class MainWindowController implements Initializable {
                 (int) deepLevel.getValue(), (int) coefficient1X.getValue(), (int) coefficient1Y.getValue(),
                 (int) coefficient2X.getValue(), (int) coefficient2Y.getValue());
 
+        buttonExtractDCT.setDisable(false);
+        buttonAttack45.setDisable(false);
+        buttonAttack90.setDisable(false);
+
         Dialogs.showImageInWindow(image, "Watermark JPG - DCT");
     }
 
@@ -191,7 +202,32 @@ public class MainWindowController implements Initializable {
         } else {
             extractedMessageWatermarkField.setStyle("-fx-text-fill: red;");
         }
+    }
 
+    public void attackRotation45() {
+        selectRotation = -45;
+        buttonExtractRotation.setDisable(false);
+        Dialogs.showImageInWindow(process_jpg.getAttackRotation(45), "Rotation 45 JPG");
+    }
+
+    public void attackRotation90() {
+        selectRotation = -90;
+        buttonExtractRotation.setDisable(false);
+        Dialogs.showImageInWindow(process_jpg.getAttackRotation(90), "Rotation 90 JPG");
+    }
+
+    public void exctractAttackRotation() {
+        String message = process_jpg.getExtractAttackRotation(componentTypeDCT.getSelectionModel().getSelectedItem(),
+                selectRotation, (int) coefficient1X.getValue(), (int) coefficient1Y.getValue(),
+                (int) coefficient2X.getValue(), (int) coefficient2Y.getValue(), messageWatermarkField.getLength());
+
+        extractedMessageWatermarkField.setText(message);
+
+        if (message.equals(messageWatermarkField.getText())) {
+            extractedMessageWatermarkField.setStyle("-fx-text-fill: green;");
+        } else {
+            extractedMessageWatermarkField.setStyle("-fx-text-fill: red;");
+        }
     }
 
     /**
@@ -221,6 +257,8 @@ public class MainWindowController implements Initializable {
         spinner.setValueFactory(valueFactory);
     }
 
+
+
     /**
      * Get max digit format for number field
      *
@@ -245,14 +283,5 @@ public class MainWindowController implements Initializable {
             if (text.matches(regexPattern)) return change;
             return null;
         };
-    }
-
-    public void attackRotation45() {
-    }
-
-    public void attackRotation90() {
-    }
-
-    public void exctractAttackRotation() {
     }
 }

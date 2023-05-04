@@ -43,5 +43,11 @@
             <version>RELEASE</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>net.imagej</groupId>
+            <artifactId>ij</artifactId>
+            <version>1.54d</version>
+        </dependency>
     </dependencies>
 </project>

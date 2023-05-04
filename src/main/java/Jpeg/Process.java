@@ -1,5 +1,6 @@
 package Jpeg;
 
+import Attacks.Rotation;
 import Enums.ComponentType;
 import Graphics.Dialogs;
 import Watermark.LSB;
@@ -15,6 +16,7 @@ public class Process {
 
     private BufferedImage originalImage;
     private BufferedImage originalWatermark;
+    private BufferedImage rotatedImage;
 
     private int[][] originalImageRed, originalWatermarkRed;
     private int[][] originalImageGreen, originalWatermarkGreen;
@@ -25,6 +27,7 @@ public class Process {
     private Matrix originalImageCb, originalWatermarkCb;
     private Matrix markImageLSB, markImageDCT;
 
+    private Matrix modifyRotateY, modifyRotateCb, modifyRotateCr;
 
     private int imageHeight, watermarkHeight;
     private int imageWidth, watermarkWidth;
@@ -77,7 +80,6 @@ public class Process {
         }
     }
 
-
     /**
      * Set RGB and YCbCr from original Image
      */
@@ -118,6 +120,35 @@ public class Process {
         originalWatermarkY = colors[0];
         originalWatermarkCb = colors[1];
         originalWatermarkCr = colors[2];
+    }
+
+    /**
+     * --------------------
+     */
+    private void setRotatedImageYCbCr() {
+        int rHeight = rotatedImage.getHeight();
+        int rWidth = rotatedImage.getWidth();
+
+        int[][] imageRed = new int[rHeight][rWidth];
+        int[][] imageGreen = new int[rHeight][rWidth];
+        int[][] imageBlue = new int[rHeight][rWidth];
+
+        for (int h = 0; h < rHeight; h++) {
+            for (int w = 0; w < rWidth; w++) {
+                Color color = new Color(originalImage.getRGB(w, h));
+                imageRed[h][w] = color.getRed();
+                imageGreen[h][w] = color.getGreen();
+                imageBlue[h][w] = color.getBlue();
+            }
+        }
+
+        Matrix[] colors = ColorTransform.convertOriginalRGBtoYcBcR(
+                imageRed, imageGreen, imageBlue);
+
+        modifyRotateY = colors[0];
+        modifyRotateCb = colors[1];
+        modifyRotateCr = colors[2];
+
     }
 
     /**
@@ -224,7 +255,36 @@ public class Process {
      */
     public String getImageWithDCTWatermark(int x1, int y1, int x2, int y2, int messageLen) {
         return DCT.extractedMessageWithDCT(getMarkImageDCT(), 8, x1, y1, x2, y2, messageLen);
+    }
 
+    public BufferedImage getAttackRotation(final int rotateDegree) {
+        rotatedImage = Rotation.rotate(getOneColorImageFromYCbCr(markImageDCT), rotateDegree);
+        return rotatedImage;
+    }
+
+    public String getExtractAttackRotation(
+            final ComponentType componentsType, final int rotateDegree, final int x1, final int y1,
+            final int x2, final int y2, final int messageLen) {
+        String extractedMessage;
+
+        rotatedImage = Rotation.rotate(rotatedImage, rotateDegree);
+        Dialogs.showImageInWindow(rotatedImage, "Back Rotated - " + rotateDegree);
+        setRotatedImageYCbCr();
+
+        switch (componentsType) {
+            case CB:
+                extractedMessage = DCT.extractedMessageWithDCT(getModifyRotateCb(), 8, x1, y1, x2, y2, messageLen);
+                break;
+            case CR:
+                extractedMessage = DCT.extractedMessageWithDCT(getOriginalImageCr(), 8, x1, y1, x2, y2, messageLen);
+                break;
+            case Y:
+            default:
+                extractedMessage = DCT.extractedMessageWithDCT(getOriginalImageY(), 8, x1, y1, x2, y2, messageLen);
+                break;
+        }
+
+        return extractedMessage;
     }
 
     /**
@@ -268,5 +328,22 @@ public class Process {
 
     public Matrix getMarkImageDCT() {
         return markImageDCT;
+    }
+
+    public BufferedImage getRotatedImage() {
+        return rotatedImage;
+    }
+
+
+    public Matrix getModifyRotateY() {
+        return modifyRotateY;
+    }
+
+    public Matrix getModifyRotateCb() {
+        return modifyRotateCb;
+    }
+
+    public Matrix getModifyRotateCr() {
+        return modifyRotateCr;
     }
 }
