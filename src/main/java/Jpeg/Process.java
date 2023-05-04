@@ -30,10 +30,14 @@ public class Process {
     private int imageWidth, watermarkWidth;
 
     public Process(String pathToImage, String pathToWatermark) {
-        init(Dialogs.loadImageFromPath(pathToImage), Dialogs.loadImageFromPath(pathToWatermark));
+        init(Dialogs.loadImageFromPath(pathToImage), Dialogs.loadImageFromPath(pathToWatermark), true);
     }
 
-    private void init(BufferedImage originalImage, BufferedImage originalWatermark) {
+    public Process(String pathToImage) {
+        init(Dialogs.loadImageFromPath(pathToImage), Dialogs.loadImageFromPath(pathToImage), false);
+    }
+
+    private void init(BufferedImage originalImage, BufferedImage originalWatermark, boolean watermark) {
         this.originalImage = originalImage;
         this.originalWatermark = originalWatermark;
 
@@ -42,12 +46,16 @@ public class Process {
         this.watermarkHeight = originalWatermark.getHeight();
         this.watermarkWidth = originalWatermark.getWidth();
 
-        initializeMatrices();
+        initializeMatrices(watermark);
         setOriginalImageRGBAndYCbCr();
-        setOriginalWatermarkRGBAndYCbCr();
+
+        if (watermark) {
+            setOriginalWatermarkRGBAndYCbCr();
+        }
+
     }
 
-    private void initializeMatrices() {
+    private void initializeMatrices(boolean watermark) {
         // Original Image
         originalImageRed = new int[imageHeight][imageWidth];
         originalImageGreen = new int[imageHeight][imageWidth];
@@ -57,14 +65,16 @@ public class Process {
         originalImageCb = new Matrix(imageHeight, imageWidth);
         originalImageCr = new Matrix(imageHeight, imageWidth);
 
-        // Original Watermark
-        originalWatermarkRed = new int[watermarkHeight][watermarkWidth];
-        originalWatermarkGreen = new int[watermarkHeight][watermarkWidth];
-        originalWatermarkBlue = new int[watermarkHeight][watermarkWidth];
+        if (watermark) {
+            // Original Watermark
+            originalWatermarkRed = new int[watermarkHeight][watermarkWidth];
+            originalWatermarkGreen = new int[watermarkHeight][watermarkWidth];
+            originalWatermarkBlue = new int[watermarkHeight][watermarkWidth];
 
-        originalWatermarkY = new Matrix(watermarkHeight, watermarkWidth);
-        originalWatermarkCb = new Matrix(watermarkHeight, watermarkWidth);
-        originalWatermarkCr = new Matrix(watermarkHeight, watermarkWidth);
+            originalWatermarkY = new Matrix(watermarkHeight, watermarkWidth);
+            originalWatermarkCb = new Matrix(watermarkHeight, watermarkWidth);
+            originalWatermarkCr = new Matrix(watermarkHeight, watermarkWidth);
+        }
     }
 
 

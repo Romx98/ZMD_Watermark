@@ -8,7 +8,7 @@ public enum ComponentType {
     CB("Cb"),
     CR("Cr");
 
-    String type;
+    final String type;
 
     ComponentType(String type) {
         this.type = type;

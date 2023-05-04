@@ -6,7 +6,8 @@ import java.net.URL;
 
 public class FilePaths {
     // Cesta k výchoziemu obrázku
-    public static final String defaultImage = "images/Lenna.png";
+    public static final String defaultImagePNG = "images/Lenna.png";
+    public static final String defaultImageJPG = "images/lena_std.jpg";
     public static final String defaultWatermark = "images/watermarks/watermark.png";
 
     // Cesta k souboru z rozhraním aplikace

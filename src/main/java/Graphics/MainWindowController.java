@@ -29,25 +29,28 @@ public class MainWindowController implements Initializable {
     private TextField bitLevelField, deepLevelField, messageWatermarkField, extractedMessageWatermarkField;
 
     @FXML
-    private ComboBox<ComponentType> componentTypeLSB, componentTypeDCT;
+    private ComboBox<ComponentType> componentTypeLSB, componentTypeDCT, watermarkType;
 
     @FXML
     private Spinner coefficient1X, coefficient1Y, coefficient2X, coefficient2Y;
 
-    private Process process;
-    private String chooseImage, chooseWatermark;
+    private Process process_png, process_jpg;
+    private String choosePNG, chooseJPG, chooseWatermark;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         componentTypeLSB.getItems().setAll(ComponentType.values());
         componentTypeDCT.getItems().setAll(ComponentType.values());
+//        watermarkType.getItems().setAll(WatermarkType.values());
 
 
         // Set default values
-        chooseImage = FilePaths.defaultImage;
+        choosePNG = FilePaths.defaultImagePNG;
+        chooseJPG = FilePaths.defaultImageJPG;
         chooseWatermark = FilePaths.defaultWatermark;
         componentTypeLSB.getSelectionModel().select(ComponentType.Y);
         componentTypeDCT.getSelectionModel().select(ComponentType.Y);
+//        watermarkType.getSelectionModel().select(WatermarkType.DCT.ordinal());
         bitLevel.setValue(3);
         deepLevel.setValue(50);
         buttonExtractLSB.setDisable(true);
@@ -67,14 +70,24 @@ public class MainWindowController implements Initializable {
         setSpinner(coefficient2Y, 2);
 
 
-        process = new Process(FilePaths.defaultImage, FilePaths.defaultWatermark);
+        process_png = new Process(FilePaths.defaultImagePNG, FilePaths.defaultWatermark);
+        process_jpg = new Process(FilePaths.defaultImageJPG);
     }
 
-    public void ChangeImage() {
+    public void ChangePNG() {
         final File file = Dialogs.openFile();
 
-        if (file != null) chooseImage = file.getAbsolutePath();
-        process = new Process(chooseImage, chooseWatermark);
+        if (file != null) choosePNG = file.getAbsolutePath();
+        process_png = new Process(choosePNG, chooseWatermark);
+
+        Reset();
+    }
+
+    public void ChangeJPG() {
+        final File file = Dialogs.openFile();
+
+        if (file != null) chooseJPG = file.getAbsolutePath();
+        process_jpg = new Process(chooseJPG);
 
         Reset();
     }
@@ -83,7 +96,7 @@ public class MainWindowController implements Initializable {
         final File file = Dialogs.openFile();
 
         if (file != null) chooseWatermark = file.getAbsolutePath();
-        process = new Process(chooseImage, chooseWatermark);
+        process_png = new Process(choosePNG, chooseWatermark);
 
         Reset();
     }
@@ -95,34 +108,41 @@ public class MainWindowController implements Initializable {
     }
 
     public void ShowImageOriginal() {
-        Dialogs.showImageInWindow(process.getOriginalImage(), "Original Image", true);
+        Dialogs.showImageInWindow(process_png.getOriginalImage(), "Original PNG", true);
+        Dialogs.showImageInWindow(process_jpg.getOriginalImage(), "Original JPG", true);
     }
 
     public void ShowWatermarkOriginal() {
-        Dialogs.showImageInWindow(process.getOriginalWatermark(), "Original Watermark", true);
+        Dialogs.showImageInWindow(process_png.getOriginalWatermark(), "Original Watermark", true);
     }
 
     /**
      *  Display of COLOR components - YCbCr -- Image and Watermark
      */
     public void ShowYOriginal() {
-        Dialogs.showImageInWindow(process.getOneColorImageFromYCbCr(process.getOriginalImageY()),
-                "Original Image Y");
-        Dialogs.showImageInWindow(process.getOneColorImageFromYCbCr(process.getOriginalWatermarkY()),
+        Dialogs.showImageInWindow(process_png.getOneColorImageFromYCbCr(process_png.getOriginalImageY()),
+                "Original PNG Y");
+        Dialogs.showImageInWindow(process_jpg.getOneColorImageFromYCbCr(process_jpg.getOriginalImageY()),
+                "Original JPG Y");
+        Dialogs.showImageInWindow(process_png.getOneColorImageFromYCbCr(process_png.getOriginalWatermarkY()),
                 "Original Watermark Y");
     }
 
     public void ShowCbOriginal() {
-        Dialogs.showImageInWindow(process.getOneColorImageFromYCbCr(process.getOriginalImageCb()),
-                "Original Image Cb");
-        Dialogs.showImageInWindow(process.getOneColorImageFromYCbCr(process.getOriginalWatermarkCb()),
+        Dialogs.showImageInWindow(process_png.getOneColorImageFromYCbCr(process_png.getOriginalImageCb()),
+                "Original PNG Cb");
+        Dialogs.showImageInWindow(process_jpg.getOneColorImageFromYCbCr(process_jpg.getOriginalImageCb()),
+                "Original JPG Cb");
+        Dialogs.showImageInWindow(process_png.getOneColorImageFromYCbCr(process_png.getOriginalWatermarkCb()),
                 "Original Watermark Cb");
     }
 
     public void ShowCrOriginal() {
-        Dialogs.showImageInWindow(process.getOneColorImageFromYCbCr(process.getOriginalImageCr()),
-                "Original Image Cr");
-        Dialogs.showImageInWindow(process.getOneColorImageFromYCbCr(process.getOriginalWatermarkCr()),
+        Dialogs.showImageInWindow(process_png.getOneColorImageFromYCbCr(process_png.getOriginalImageCr()),
+                "Original PNG Cr");
+        Dialogs.showImageInWindow(process_jpg.getOneColorImageFromYCbCr(process_jpg.getOriginalImageCr()),
+                "Original JPG Cr");
+        Dialogs.showImageInWindow(process_png.getOneColorImageFromYCbCr(process_png.getOriginalWatermarkCr()),
                 "Original Watermark Cr");
     }
     // end
@@ -132,35 +152,35 @@ public class MainWindowController implements Initializable {
      */
     public void MarkLSBWatermark() {
         buttonExtractLSB.setDisable(false);
-        Dialogs.showImageInWindow(process.getImageWithLSBWatermark(componentTypeLSB.getSelectionModel().getSelectedItem(),
-                (int) bitLevel.getValue(), multipleWatermark.isSelected()), "Watermark Image - LSB");
+        Dialogs.showImageInWindow(process_png.getImageWithLSBWatermark(componentTypeLSB.getSelectionModel().getSelectedItem(),
+                (int) bitLevel.getValue(), multipleWatermark.isSelected()), "Watermark PNG - LSB");
     }
 
     /**
      * Show mark image with LSB method
      */
     public void ExtractLSBWatermark() {
-        Dialogs.showImageInWindow(process.getExtractImageWithLSBWatermark((int) bitLevel.getValue()),
-                "Extracted watermark - LSB");
+        Dialogs.showImageInWindow(process_png.getExtractImageWithLSBWatermark((int) bitLevel.getValue()),
+                "Extracted PNG - LSB");
     }
 
     /**
      * Watermarks the image using the 2-DCT method
      */
     public void MarkDCTWatermark() {
-        BufferedImage image = process.getImageWithDCTWatermark(
+        BufferedImage image = process_jpg.getImageWithDCTWatermark(
                 componentTypeDCT.getSelectionModel().getSelectedItem(), messageWatermarkField.getText(),
                 (int) deepLevel.getValue(), (int) coefficient1X.getValue(), (int) coefficient1Y.getValue(),
                 (int) coefficient2X.getValue(), (int) coefficient2Y.getValue());
 
-        Dialogs.showImageInWindow(image, "Watermark Image - DCT");
+        Dialogs.showImageInWindow(image, "Watermark JPG - DCT");
     }
 
     /**
      * Show mark image with 2-DCT method
      */
     public void ExtractDCTWatermark() {
-        String message = process.getImageWithDCTWatermark(
+        String message = process_jpg.getImageWithDCTWatermark(
                 (int) deepLevel.getValue(), (int) coefficient1X.getValue(), (int) coefficient1Y.getValue(),
                 (int) coefficient2X.getValue(), (int) coefficient2Y.getValue(), messageWatermarkField.getLength());
 
@@ -225,5 +245,14 @@ public class MainWindowController implements Initializable {
             if (text.matches(regexPattern)) return change;
             return null;
         };
+    }
+
+    public void attackRotation45() {
+    }
+
+    public void attackRotation90() {
+    }
+
+    public void exctractAttackRotation() {
     }
 }
