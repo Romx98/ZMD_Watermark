@@ -3,6 +3,7 @@ package Jpeg;
 import Enums.ComponentType;
 import Graphics.Dialogs;
 import Watermark.LSB;
+import Watermark.DCT;
 import Jama.Matrix;
 
 import java.awt.*;
@@ -22,7 +23,7 @@ public class Process {
     private Matrix originalImageY, originalWatermarkY;
     private Matrix originalImageCr, originalWatermarkCr;
     private Matrix originalImageCb, originalWatermarkCb;
-    private Matrix markImageLSB;
+    private Matrix markImageLSB, markImageDCT;
 
 
     private int imageHeight, watermarkHeight;
@@ -172,6 +173,52 @@ public class Process {
     }
 
     /**
+     * Watermarking process using DCT technique
+     *
+     * @param componentsType - Image component (Y, Cb, Cr)
+     * @param message - message used to watermark (binary text)
+     * @param deep - deep level
+     * @param x1 - position X for block 1
+     * @param y1 - position Y for block 1
+     * @param x2 - position X for block 2
+     * @param y2 - position Y for block 2
+     * @return Watermarked component image
+     */
+    public BufferedImage getImageWithDCTWatermark(
+            ComponentType componentsType, String message, int deep, int x1, int y1, int x2, int y2) {
+        switch (componentsType) {
+            case CB:
+                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageCb(), message, deep, x1, y1, x2, y2);
+                break;
+            case CR:
+                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageCr(), message, deep, x1, y1, x2, y2);
+                break;
+            case Y:
+            default:
+                markImageDCT = DCT.watermarkedMatrixWithDCT(getOriginalImageY(), message, deep, x1, y1, x2, y2);
+                break;
+        }
+
+        return getOneColorImageFromYCbCr(markImageDCT);
+    }
+
+    /**
+     * Watermark extraction process using DCT technique
+     *
+     * @param deep - deep level
+     * @param x1 - position X for block 1
+     * @param y1 - position Y for block 1
+     * @param x2 - position X for block 2
+     * @param y2 - position Y for block 2
+     * @param messageLen - message length
+     * @return Extracted message
+     */
+    public String getImageWithDCTWatermark(int deep, int x1, int y1, int x2, int y2, int messageLen) {
+        return DCT.extractedMessageWithDCT(getMarkImageDCT(), deep, x1, y1, x2, y2, messageLen);
+
+    }
+
+    /**
      *  GETTERS
      */
     public BufferedImage getOriginalImage() {
@@ -208,5 +255,9 @@ public class Process {
 
     public Matrix getMarkImageLSB() {
         return markImageLSB;
+    }
+
+    public Matrix getMarkImageDCT() {
+        return markImageDCT;
     }
 }
